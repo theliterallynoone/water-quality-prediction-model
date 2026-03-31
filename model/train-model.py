@@ -53,7 +53,14 @@ y = df["Quality"]
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y_encoded,
+    test_size=0.2,
+    random_state=42,
+    # Keeps class distribution stable for small datasets.
+    stratify=y_encoded,
+)
 
 model= RandomForestClassifier(n_estimators=100, max_depth=None, random_state=42)
 model.fit(X_train, y_train)
@@ -64,11 +71,19 @@ print("\nClassification Report:")
 # Ensure report includes all classes even if a class is missing from `y_test`
 # due to small dataset size.
 all_labels = list(range(len(le.classes_)))
-print(classification_report(y_test, y_pred, labels=all_labels, target_names=le.classes_))
+print(
+    classification_report(
+        y_test,
+        y_pred,
+        labels=all_labels,
+        target_names=le.classes_,
+        zero_division=0,
+    )
+)
 
 
 # Example: Delhi Yamuna-like polluted water
-sample = np.array([[6.5, 2.2, 12.0, 40, 3.5, 50000]])
+sample = pd.DataFrame([[6.5, 2.2, 12.0, 40, 3.5, 50000]], columns=features)
 prediction = model.predict(sample)
 predicted_label = le.inverse_transform(prediction)
 print("\nSample Prediction:", predicted_label[0])
