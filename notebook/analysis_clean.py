@@ -23,7 +23,6 @@ def classify_water(row: pd.Series) -> str:
     return "Safe"
 
 
-# Load CSV using a path relative to this file (works no matter where you run from)
 csv_path = Path(__file__).resolve().parent.parent / "data" / "water-quality.csv"
 df = pd.read_csv(csv_path)
 print(df.head())
