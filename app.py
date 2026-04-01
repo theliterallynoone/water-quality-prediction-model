@@ -11,6 +11,8 @@ df=df.dropna()
 
 def classify_water(row):
     score=0
+    if row['Coliform'] > 500:
+        score += 1
     if row['DO'] < 4:
         score += 1
     if row['BOD'] > 6:
@@ -18,8 +20,6 @@ def classify_water(row):
     if row['COD'] > 20:
         score += 1
     if row['Nitrate'] > 1:
-        score += 1
-    if row['Coliform'] > 500:
         score += 1
 
     if score >= 3:

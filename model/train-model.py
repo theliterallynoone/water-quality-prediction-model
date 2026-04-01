@@ -6,8 +6,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 
-# Resolve CSV path relative to this file so the script works
-# no matter what directory you run it from.
 csv_path = Path(__file__).resolve().parent.parent / "data" / "water-quality.csv"
 df = pd.read_csv(csv_path)
 print("Dataset Preview:")
@@ -68,8 +66,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print("\nAccuracy:", accuracy_score(y_test, y_pred))
 print("\nClassification Report:")
-# Ensure report includes all classes even if a class is missing from `y_test`
-# due to small dataset size.
+
 all_labels = list(range(len(le.classes_)))
 print(
     classification_report(
