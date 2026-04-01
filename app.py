@@ -1,10 +1,12 @@
-import streamlit as st
-import numpy as np
+from pathlib import Path
+
 import pandas as pd
+import streamlit as st
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 
-df= pd.read_csv("data/water-quality.csv")
+_ROOT = Path(__file__).resolve().parent
+df = pd.read_csv(_ROOT / "data" / "water-quality.csv")
 df=df.dropna()
 
 def classify_water(row):
@@ -36,8 +38,8 @@ y=df["Quality"]
 le=LabelEncoder()
 y_encoded=le.fit_transform(y)
 
-model= RandomForestClassifer(n_estimators=100)
-model.fit(X, y_encoded)
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(x, y_encoded)
 
 #NOW I GET TO BUILD THE UI YAYYYYYYY
 st.title("Water Quality Predictor") #add the shiny emoji thingy later
@@ -47,16 +49,16 @@ DO= st.slider("Dissolved Oxygen", 0.0, 10.0, 5.0)
 BOD= st.slider("Biological Oxygen Demand", 0.0, 20.0, 3.0)
 COD= st.slider("Chemical Oxygen Demand", 0.0, 50.0, 10.0)
 nitrate= st.slider("Nitrate", 0.0, 10.0, 1.0)
-coliform= st.slider("Coliform", 0.0, 50000, 100)
+coliform = st.slider("Coliform", 0.0, 50000.0, 100.0, step=1.0)
 
 if st.button("Predict"):
-    sample=np.array([[pH, DO, BOD, COD, nitrate, coliform]])
-    prediction=model.predict(sample)
-    result=le.inverse_transform(prediction)
+    sample = pd.DataFrame([[pH, DO, BOD, COD, nitrate, coliform]], columns=features)
+    prediction = model.predict(sample)
+    label = le.inverse_transform(prediction)[0]
 
-    if result=='safe':
+    if label == "Safe":
         st.success("The water is safe for consumption")
-    elif result=='moderate':
-        st.warning("The water is moderate for consumption/moderately safe")
+    elif label == "Moderate":
+        st.warning("The water is moderate for consumption/moderately safe") #i gotta pick out a better statement
     else:
         st.error("The water is unsafe for consumption")
