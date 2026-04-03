@@ -75,7 +75,10 @@ if page == "Home":
     if st.button("Predict"):
         sample = pd.DataFrame([[pH, DO, BOD, COD, Nitrate, coliform]], columns=features)
         prediction = model.predict(sample)
-        label = le.inverse_transform(prediction)[0]
+        label = le.inverse_transform(prediction)[0] #gotta checck this later- is this supposed to be label or result
+
+        if coliform>10000:
+            result="Unsafe"
 
         if label == "Safe":
             st.success("The water is safe for consumption")
@@ -104,7 +107,7 @@ elif page == "About":
     - Generate prediction + explanation
     """)
 
-    st.subheader("🌍 Sustainable Development Goals")
+    st.subheader("Sustainable Development Goals")
     st.write("""
     - SDG 6: Clean Water and Sanitation 💧
     - SDG 3: Good Health and Well-being 🏥
