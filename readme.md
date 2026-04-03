@@ -1,4 +1,6 @@
 # Water Quality Predictor
+### HYDROSENSE-AI
+https://hydrosense-ai.streamlit.app/
 
 A machine learning project that predicts water quality based on physical, chemical, and biological parameters.
 
