@@ -13,29 +13,37 @@ df = pd.read_csv(_ROOT / "data" / "water-quality.csv")
 df=df.dropna()
 
 def classify_water(row):
-    score=0
-    if row['Coliform'] > 500:
+    if row["Coliform"] > 2000:
+        return "Unsafe"
+    score = 0
+    if row["Coliform"] > 500:
         score += 1
-    if row['DO'] < 4:
+    if row["DO"] < 4:
         score += 1
-    if row['BOD'] > 6:
+    if row["BOD"] > 6:
         score += 1
-    if row['COD'] > 20:
+    if row["COD"] > 20:
         score += 1
-    if row['Nitrate'] > 1:
+    if row["Nitrate"] > 1:
         score += 1
-    if row['pH'] < 6.5 or row['pH'] > 8.5:
+    if row["pH"] < 6.5 or row["pH"] > 8.5:
         score += 1
     if score >= 3:
         return "Unsafe"
-    elif score >= 1:
+    if score >= 1:
         return "Moderate"
-    else:
-        return "Safe"
+    return "Safe"
+
+
+def _worst_quality(a: str, b: str) -> str:
+    order = {"Safe": 0, "Moderate": 1, "Unsafe": 2}
+    return a if order[a] >= order[b] else b
 
 def explain_result(pH, DO, BOD, COD, Nitrate, Coliform):
     reasons = []
-    if Coliform > 500:
+    if Coliform > 2000:
+        reasons.append("Very high coliform is a strong indicator of unsafe water (fecal contamination risk)")
+    elif Coliform > 500:
         reasons.append("High coliform levels indicate possible sewage contamination")
     if DO < 4:
         reasons.append("Low dissolved oxygen harms aquatic life")
@@ -75,10 +83,9 @@ if page == "Home":
     if st.button("Predict"):
         sample = pd.DataFrame([[pH, DO, BOD, COD, Nitrate, coliform]], columns=features)
         prediction = model.predict(sample)
-        label = le.inverse_transform(prediction)[0] #gotta checck this later- is this supposed to be label or result
-
-        if coliform>10000:
-            result="Unsafe"
+        ml_label = le.inverse_transform(prediction)[0]
+        rule_label = classify_water(sample.iloc[0])
+        label = _worst_quality(rule_label, ml_label)
 
         if label == "Safe":
             st.success("The water is safe for consumption")

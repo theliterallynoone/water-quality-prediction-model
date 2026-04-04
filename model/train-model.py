@@ -18,24 +18,25 @@ for col in drop_cols:
 df = df.dropna()
 
 def classify_water(row):
-    score=0
-    if row['DO'] < 4:
+    if row["Coliform"] > 2000:
+        return "Unsafe"
+    score = 0
+    if row["DO"] < 4:
         score += 1
-    if row['BOD'] > 6:
+    if row["BOD"] > 6:
         score += 1
-    if row['COD'] > 20:
+    if row["COD"] > 20:
         score += 1
-    if row['Nitrate'] > 1:
+    if row["Nitrate"] > 1:
         score += 1
-    if row['Coliform'] > 500:
+    if row["Coliform"] > 500:
         score += 1
 
     if score >= 3:
         return "Unsafe"
-    elif score >= 1:
+    if score >= 1:
         return "Moderate"
-    else:
-        return "Safe"
+    return "Safe"
     
 df["Quality"] = df.apply(classify_water, axis=1)
 print("\nClass Distribution:")
